@@ -1,4 +1,4 @@
-<meta name='viewport' content='width=device-width, initial-scale=1'/>[
+[
   { "roll": "101", "name": "Aarav Kumar", "marks": 89, "result": "Pass" },
   { "roll": "102", "name": "Meera Nair", "marks": 28, "result": "Fail" },
   { "roll": "103", "name": "Ravi Patel", "marks": 76, "result": "Pass" },
