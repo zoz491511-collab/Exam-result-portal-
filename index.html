@@ -36,6 +36,7 @@ If you want, I can:
 
 -->
 
+
 <!doctype html>
 <html lang="en">
 <head>
@@ -43,72 +44,65 @@ If you want, I can:
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Exam Result Portal</title>
   <style>
-    :root{font-family:Inter,system-ui,Segoe UI,Roboto,'Helvetica Neue',Arial;}
-    body{margin:0;background:#f4f6fb;color:#111;display:flex;align-items:flex-start;justify-content:center;padding:28px}
-    .card{width:980px;max-width:96%;background:white;border-radius:12px;padding:20px;box-shadow:0 6px 22px rgba(20,30,60,0.08)}
-    h1{margin:0 0 8px;font-size:20px}
-    .controls{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
-    input[type=text]{padding:10px;border-radius:8px;border:1px solid #d8e0ef;min-width:220px}
-    button{padding:10px 12px;border-radius:8px;border:0;background:#2563eb;color:white;cursor:pointer}
-    button.secondary{background:#64748b}
-    .info{font-size:13px;color:#475569;margin-top:8px}
-    table{width:100%;border-collapse:collapse;margin-top:14px}
-    th,td{padding:8px;border-bottom:1px solid #eef2ff;text-align:left}
-    th{background:#fbfbff}
-    .no-results{padding:18px;text-align:center;color:#64748b}
-    pre.sample{background:#0f172a;color:#fff;padding:12px;border-radius:8px;overflow:auto}
-    .row-actions{display:flex;gap:8px}
-    @media (max-width:640px){.controls{flex-direction:column}input[type=text]{width:100%}}
+    :root { font-family: Inter, system-ui, Segoe UI, Roboto, 'Helvetica Neue', Arial; }
+    body { margin:0; background:#f4f6fb; color:#111; display:flex; align-items:flex-start; justify-content:center; padding:28px }
+    .card { width:980px; max-width:96%; background:white; border-radius:12px; padding:20px; box-shadow:0 6px 22px rgba(20,30,60,0.08) }
+    h1 { margin:0 0 8px; font-size:22px }
+    .controls { display:flex; gap:8px; flex-wrap:wrap; margin:12px 0 }
+    input[type=text] { padding:10px; border-radius:8px; border:1px solid #d8e0ef; min-width:220px }
+    button { padding:10px 12px; border-radius:8px; border:0; background:#2563eb; color:white; cursor:pointer }
+    button.secondary { background:#64748b }
+    .info { font-size:13px; color:#475569; margin-top:8px }
+    #result { margin-top:20px; padding:12px; border-radius:8px; background:#f8fafc }
+    @media (max-width:640px) { .controls{flex-direction:column} input[type=text]{width:100%} }
   </style>
 </head>
 <body>
   <div class="card">
     <h1>Exam Result Portal</h1>
-    <div class="info">Search by Roll Number, Name, or choose a Class. Results are loaded from <code>/results.json</code> if present; otherwise the built-in sample data is used.</div>
+    <div class="info">Enter your roll number and name to view your result.</div>
 
     <div class="controls">
-      <input id="q" type="text" placeholder="Enter roll number or student name" />
-      <select id="classFilter"><option value="">All classes</option></select>
-      <button id="searchBtn">Search</button>
-      <button id="showAllBtn" class="secondary">Show all</button>
-      <input id="fileInput" type="file" accept="application/json" />
-      <button id="printBtn" class="secondary">Print Result</button>
+      <input id="roll" type="text" placeholder="Enter Roll Number" />
+      <input id="name" type="text" placeholder="Enter Name" />
+      <button onclick="checkResult()">Check Result</button>
     </div>
 
-    <div id="resultArea"></div>
-
-    <hr />
-    <div style="font-size:13px;color:#475569">Admin: You can drop a <code>results.json</code> file in the repo root or use the file input to test locally. Format is an array of student objects (see top of this file for example).</div>
+    <div id="result"></div>
   </div>
 
-  <script><script>
-async function checkResult() {
-  const rollInput = document.getElementById('roll').value.trim();
-  const nameInput = document.getElementById('name').value.trim().toLowerCase();
-  const outputDiv = document.getElementById('result');
+  <script>
+    async function checkResult() {
+      const rollInput = document.getElementById('roll').value.trim();
+      const nameInput = document.getElementById('name').value.trim().toLowerCase();
+      const outputDiv = document.getElementById('result');
 
-  try {
-    // Fetch the results.json file hosted on your site
-    const response = await fetch('results.json');
-    const data = await response.json();
+      outputDiv.innerHTML = `<p>Checking...</p>`;
 
-    // Find the student by roll number and name
-    const student = data.find(
-      (s) => s.roll === rollInput && s.name.toLowerCase() === nameInput
-    );
+      try {
+        const response = await fetch('results.json');
+        if (!response.ok) throw new Error('File not found');
+        const data = await response.json();
 
-    if (student) {
-      outputDiv.innerHTML = `
-        <h3>Result Found ✅</h3>
-        <p><strong>Name:</strong> ${student.name}</p>
-        <p><strong>Roll No:</strong> ${student.roll}</p>
-        <p><strong>Marks:</strong> ${student.marks}</p>
-        <p><strong>Status:</strong> ${student.result}</p>
-      `;
-    } else {
-      outputDiv.innerHTML = `<p style="color:red;">No result found ❌</p>`;
+        const student = data.find(
+          (s) => s.roll === rollInput && s.name.toLowerCase() === nameInput
+        );
+
+        if (student) {
+          outputDiv.innerHTML = `
+            <h3>Result Found ✅</h3>
+            <p><strong>Name:</strong> ${student.name}</p>
+            <p><strong>Roll No:</strong> ${student.roll}</p>
+            <p><strong>Marks:</strong> ${student.marks}</p>
+            <p><strong>Status:</strong> ${student.result}</p>
+          `;
+        } else {
+          outputDiv.innerHTML = `<p style="color:red;">No result found ❌</p>`;
+        }
+      } catch (error) {
+        outputDiv.innerHTML = `<p style="color:red;">Error: ${error.message}</p>`;
+      }
     }
-  } catch (error) {
-    outputDiv.innerHTML = `<p style="color:red;">Error fetching results. Check file connection.</p>`;
-  }
-}
+  </script>
+</body>
+</html>
