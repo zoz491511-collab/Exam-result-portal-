@@ -1,0 +1,212 @@
+<!--
+Exam Result Portal (Single-file)
+Filename: index.html
+
+What's included:
+- A single static HTML file that provides a search UI to check exam results by Roll Number, Name, or Class.
+- The page will try to fetch /results.json from the same repo (recommended) and fall back to an embedded sample dataset.
+- Admin can upload/replace the dataset using the "Upload results.json" file input (client-side only).
+
+How to deploy (GitHub + Netlify):
+1. Create a new GitHub repository (public or private).
+2. Add this index.html to the repo root. (Optional) Add a results.json file to the repo root if you want to maintain the data separately.
+3. Push the repo to GitHub.
+4. Go to Netlify -> Sites -> "Add new site" -> "Import from Git" -> connect your GitHub account -> select the repo -> set "Build command" empty and "Publish directory" to "/" (or leave defaults for a plain static site) -> Deploy site.
+5. Netlify will publish a URL. If you later update the repo, Netlify auto-deploys on push.
+
+Notes on results.json format (example):
+[
+  {
+    "roll": "1001",
+    "name": "Asha Kumar",
+    "class": "10A",
+    "marks": { "Math": 88, "English": 76, "Science": 92 },
+    "total": 256,
+    "percentage": 85.33
+  }
+]
+
+Security & scaling:
+- This single-file solution is suitable for small schools or test scenarios with non-sensitive data. For large datasets or privacy requirements, use a backend (Firebase, Supabase, or a database + API) and protect access.
+
+If you want, I can:
+- Create a repository structure for you (multiple files) and provide exact git commands.
+- Add CSV import, pagination, or print-ready result cards.
+- Integrate with a simple serverless backend for authorized uploads.
+
+-->
+
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Exam Result Portal</title>
+  <style>
+    :root{font-family:Inter,system-ui,Segoe UI,Roboto,'Helvetica Neue',Arial;}
+    body{margin:0;background:#f4f6fb;color:#111;display:flex;align-items:flex-start;justify-content:center;padding:28px}
+    .card{width:980px;max-width:96%;background:white;border-radius:12px;padding:20px;box-shadow:0 6px 22px rgba(20,30,60,0.08)}
+    h1{margin:0 0 8px;font-size:20px}
+    .controls{display:flex;gap:8px;flex-wrap:wrap;margin:12px 0}
+    input[type=text]{padding:10px;border-radius:8px;border:1px solid #d8e0ef;min-width:220px}
+    button{padding:10px 12px;border-radius:8px;border:0;background:#2563eb;color:white;cursor:pointer}
+    button.secondary{background:#64748b}
+    .info{font-size:13px;color:#475569;margin-top:8px}
+    table{width:100%;border-collapse:collapse;margin-top:14px}
+    th,td{padding:8px;border-bottom:1px solid #eef2ff;text-align:left}
+    th{background:#fbfbff}
+    .no-results{padding:18px;text-align:center;color:#64748b}
+    pre.sample{background:#0f172a;color:#fff;padding:12px;border-radius:8px;overflow:auto}
+    .row-actions{display:flex;gap:8px}
+    @media (max-width:640px){.controls{flex-direction:column}input[type=text]{width:100%}}
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Exam Result Portal</h1>
+    <div class="info">Search by Roll Number, Name, or choose a Class. Results are loaded from <code>/results.json</code> if present; otherwise the built-in sample data is used.</div>
+
+    <div class="controls">
+      <input id="q" type="text" placeholder="Enter roll number or student name" />
+      <select id="classFilter"><option value="">All classes</option></select>
+      <button id="searchBtn">Search</button>
+      <button id="showAllBtn" class="secondary">Show all</button>
+      <input id="fileInput" type="file" accept="application/json" />
+      <button id="printBtn" class="secondary">Print Result</button>
+    </div>
+
+    <div id="resultArea"></div>
+
+    <hr />
+    <div style="font-size:13px;color:#475569">Admin: You can drop a <code>results.json</code> file in the repo root or use the file input to test locally. Format is an array of student objects (see top of this file for example).</div>
+  </div>
+
+  <script>
+    // --- sample data fallback ---
+    let data = [
+      { roll: '1001', name: 'Asha Kumar', class: '10A', marks: { Math: 88, English: 76, Science: 92 }, total: 256, percentage: 85.33 },
+      { roll: '1002', name: 'Ravi Menon', class: '10A', marks: { Math: 72, English: 64, Science: 70 }, total: 206, percentage: 68.67 },
+      { roll: '1003', name: 'Sana Joseph', class: '10B', marks: { Math: 95, English: 90, Science: 98 }, total: 283, percentage: 94.33 },
+      { roll: '2001', name: 'Imran Khan', class: '12C', marks: { Physics: 78, Chemistry: 81, Maths: 85 }, total: 244, percentage: 81.33 }
+    ];
+
+    const qEl = document.getElementById('q');
+    const classFilterEl = document.getElementById('classFilter');
+    const resultArea = document.getElementById('resultArea');
+
+    async function loadData(){
+      try{
+        const resp = await fetch('./results.json', {cache: 'no-cache'});
+        if(!resp.ok) throw new Error('no file');
+        const j = await resp.json();
+        if(Array.isArray(j) && j.length) data = j;
+        console.log('Loaded results.json from repo.');
+      }catch(e){
+        console.log('Using embedded sample data. If you want dynamic data, add results.json to the site root.');
+      }
+      populateClassFilter();
+      renderResults(data);
+    }
+
+    function populateClassFilter(){
+      const classes = Array.from(new Set(data.map(s=>s.class))).sort();
+      classFilterEl.innerHTML = '<option value="">All classes</option>' + classes.map(c=>`<option value="${c}">${c}</option>`).join('');
+    }
+
+    function renderResults(list){
+      if(!list || list.length===0){
+        resultArea.innerHTML = '<div class="no-results">No results to show.</div>';
+        return;
+      }
+      const rows = list.map(s=>{
+        const marks = s.marks ? Object.entries(s.marks).map(([k,v])=>`<div><strong>${k}</strong>: ${v}</div>`).join('') : '';
+        return `
+          <tr>
+            <td>${s.roll}</td>
+            <td>${escapeHtml(s.name)}</td>
+            <td>${s.class || ''}</td>
+            <td>${marks}</td>
+            <td>${s.total ?? ''}</td>
+            <td>${s.percentage ?? ''}</td>
+            <td class="row-actions"><button onclick="showCard('${s.roll}')">View</button></td>
+          </tr>
+        `;
+      }).join('');
+
+      resultArea.innerHTML = `
+        <table>
+          <thead><tr><th>Roll</th><th>Name</th><th>Class</th><th>Marks</th><th>Total</th><th>%</th><th></th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+      `;
+    }
+
+    function escapeHtml(str){ if(!str) return ''; return String(str).replace(/[&<>"']/g, function(m){ return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":"&#39;"}[m]; }); }
+
+    function search(){
+      const q = qEl.value.trim().toLowerCase();
+      const cls = classFilterEl.value;
+      let filtered = data.filter(s=>{
+        const matchQ = !q || (s.roll && s.roll.toLowerCase().includes(q)) || (s.name && s.name.toLowerCase().includes(q));
+        const matchC = !cls || (s.class === cls);
+        return matchQ && matchC;
+      });
+      renderResults(filtered);
+      if(filtered.length===1){ showCard(filtered[0].roll); }
+    }
+
+    function showCard(roll){
+      const s = data.find(x=>x.roll === roll);
+      if(!s) return alert('Result not found');
+      const marksHtml = s.marks ? Object.entries(s.marks).map(([k,v])=>`<tr><td>${k}</td><td>${v}</td></tr>`).join('') : '';
+      const html = `
+        <div style="padding:12px;max-width:760px">
+          <h2>Result — ${escapeHtml(s.name)} (${s.roll})</h2>
+          <div><strong>Class:</strong> ${s.class || ''}</div>
+          <table style="margin-top:12px;border-collapse:collapse;width:100%">
+            <thead><tr><th style="text-align:left">Subject</th><th style="text-align:left">Marks</th></tr></thead>
+            <tbody>${marksHtml}</tbody>
+          </table>
+          <div style="margin-top:8px"><strong>Total:</strong> ${s.total ?? ''} &nbsp; <strong>Percentage:</strong> ${s.percentage ?? ''}</div>
+          <div style="margin-top:10px"><button onclick="window.print();">Print</button></div>
+        </div>
+      `;
+      // show modal-like
+      const modal = document.createElement('div');
+      modal.style.position='fixed'; modal.style.inset=0; modal.style.background='rgba(2,6,23,0.6)'; modal.style.display='flex'; modal.style.alignItems='center'; modal.style.justifyContent='center'; modal.style.zIndex=9999;
+      const box = document.createElement('div'); box.style.background='white'; box.style.borderRadius='10px'; box.style.padding='18px'; box.style.maxWidth='90%'; box.style.maxHeight='90%'; box.style.overflow='auto';
+      box.innerHTML = html + '<div style="text-align:right;margin-top:8px"><button id="closeModal">Close</button></div>';
+      modal.appendChild(box);
+      document.body.appendChild(modal);
+      document.getElementById('closeModal').onclick = ()=> modal.remove();
+    }
+
+    // Print button uses current displayed result or full table
+    document.getElementById('printBtn').addEventListener('click', ()=> window.print());
+    document.getElementById('searchBtn').addEventListener('click', search);
+    document.getElementById('showAllBtn').addEventListener('click', ()=>{ qEl.value=''; classFilterEl.value=''; renderResults(data); });
+
+    // File upload to replace dataset (client-side only)
+    document.getElementById('fileInput').addEventListener('change', async (e)=>{
+      const f = e.target.files[0];
+      if(!f) return;
+      try{
+        const txt = await f.text();
+        const j = JSON.parse(txt);
+        if(!Array.isArray(j)) throw new Error('JSON must be an array');
+        data = j;
+        populateClassFilter();
+        renderResults(data);
+        alert('Loaded results.json from file (client-side). To keep this live on the web, add results.json to your repo root and redeploy.');
+      }catch(err){ alert('Failed to load JSON: '+err.message); }
+    });
+
+    // keyboard enter triggers search
+    qEl.addEventListener('keydown', (e)=>{ if(e.key==='Enter') search(); });
+
+    // init
+    loadData();
+  </script>
+</body>
+  </html>
+  
