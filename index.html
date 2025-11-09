@@ -36,102 +36,99 @@ If you want, I can:
 
 -->
 
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Exam Result Portal</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Exam Result Portal</title>
 
-<style>
-  :root { font-family: 'Inter', system-ui, Arial, sans-serif; }
-  body {
-    margin: 0;
-    background: #f2f4f8;
-    color: #111;
-    display: flex;
-    align-items: flex-start;
-    justify-content: center;
-    padding: 28px;
-  }
-  .card {
-    width: 980px;
-    max-width: 96%;
-    background: white;
-    border-radius: 12px;
-    padding: 20px;
-    box-shadow: 0 6px 22px rgba(20, 30, 60, 0.08);
-  }
-  h1 {
-    margin: 0 0 8px;
-    font-size: 24px;
-    text-align: center;
-    color: #2563eb;
-  }
-  .info {
-    text-align: center;
-    font-size: 14px;
-    color: #475569;
-    margin-bottom: 20px;
-  }
-  .controls {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    max-width: 400px;
-    margin: 0 auto 20px auto;
-  }
-  input, button {
-    padding: 10px;
-    border-radius: 8px;
-    border: 1px solid #d8e0ef;
-    font-size: 15px;
-  }
-  button {
-    background: #2563eb;
-    color: white;
-    border: none;
-    cursor: pointer;
-    font-weight: 500;
-  }
-  button:hover { background: #1e40af; }
-  #result {
-    margin-top: 20px;
-    padding: 15px;
-    border-radius: 8px;
-    background: #f9fafb;
-  }
-  #pdfBtn {
-    background: #047857;
-    margin-top: 12px;
-  }
-  #pdfBtn:hover { background: #065f46; }
-  footer {
-    margin-top: 20px;
-    text-align: center;
-    color: #64748b;
-    font-size: 13px;
-  }
-  .logo {
-    display: block;
-    margin: 0 auto 15px auto;
-    width: 90px;
-    border-radius: 12px;
-  }
-  table {
-    border-collapse: collapse;
-    width: 100%;
-    margin-top: 10px;
-  }
-  th, td {
-    border: 1px solid #e2e8f0;
-    padding: 8px;
-    text-align: left;
-  }
-  th {
-    background-color: #f1f5f9;
-  }
-</style>
+  <style>
+    :root { font-family: 'Inter', system-ui, Arial, sans-serif; }
+    body {
+      margin: 0;
+      background: #f2f4f8;
+      color: #111;
+      display: flex;
+      align-items: flex-start;
+      justify-content: center;
+      padding: 28px;
+    }
+    .card {
+      max-width: 980px;
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 6px 22px rgba(20, 30, 60, 0.08);
+    }
+    h1 {
+      margin: 0 0 8px;
+      font-size: 24px;
+      text-align: center;
+      color: #2563eb;
+    }
+    .info {
+      text-align: center;
+      font-size: 14px;
+      color: #475569;
+      margin-bottom: 20px;
+    }
+    .controls {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-width: 400px;
+      margin: 0 auto 20px auto;
+    }
+    input, button {
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #d8e0ef;
+      font-size: 15px;
+    }
+    button {
+      background: #2563eb;
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-weight: 500;
+    }
+    button:hover { background: #1e40af; }
+    #result {
+      margin-top: 20px;
+      padding: 15px;
+      border-radius: 8px;
+      background: #f9fafb;
+    }
+    #pdfBtn {
+      background: #047857;
+      margin-top: 12px;
+    }
+    #pdfBtn:hover { background: #065f46; }
+    footer {
+      margin-top: 20px;
+      text-align: center;
+      color: #47413b;
+      font-size: 13px;
+    }
+    .logo {
+      display: block;
+      margin: 0 auto 15px auto;
+      width: 90px;
+      border-radius: 12px;
+    }
+    table {
+      border-collapse: collapse;
+      width: 100%;
+      margin-top: 10px;
+    }
+    th, td {
+      border: 1px solid #d2e8f0;
+      padding: 8px;
+      text-align: left;
+    }
+    th { background-color: #f1f5f9; }
+  </style>
 </head>
 
 <body>
@@ -143,111 +140,125 @@ If you want, I can:
     <div class="controls">
       <input id="roll" type="text" placeholder="Enter Roll Number" />
       <input id="dob" type="date" />
+
+      <!-- ✅ Google reCAPTCHA -->
+      <div class="g-recaptcha" data-sitekey="6LeP5wYsAAAAAANhXQx7GxFfed5SRya1fGQ7iR5Y"></div>
+
       <button onclick="checkResult()">Check Result</button>
     </div>
 
     <div id="result"></div>
-
     <footer>© 2025 Secure Result Portal — Powered by 47NewsPublic</footer>
   </div>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <!-- ✅ JS libraries -->
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+  <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 
   <script>
-  async function checkResult() {
-    const rollInput = document.getElementById('roll').value.trim();
-    const dobInput = document.getElementById('dob').value.trim();
-    const outputDiv = document.getElementById('result');
+    async function checkResult() {
+      const rollInput = document.getElementById('roll').value.trim();
+      const dobInput = document.getElementById('dob').value.trim();
+      const outputDiv = document.getElementById('result');
 
-    if (!rollInput || !dobInput) {
-      outputDiv.innerHTML = `<p style="color:red;">⚠️ Please enter both Roll Number and Date of Birth.</p>`;
-      return;
-    }
-
-    try {
-      const response = await fetch('results.json');
-      const data = await response.json();
-
-      const student = data.find(
-        (s) => s.roll === rollInput && s.dob === dobInput
-      );
-
-      if (student) {
-        const grade = student.percentage >= 75 ? 'A' :
-                      student.percentage >= 60 ? 'B' :
-                      student.percentage >= 35 ? 'C' : 'Fail';
-
-        let marksHTML = '<table><tr><th>Subject</th><th>Marks</th></tr>';
-        for (const [subject, mark] of Object.entries(student.marks)) {
-          marksHTML += `<tr><td>${subject}</td><td>${mark}</td></tr>`;
-        }
-        marksHTML += '</table>';
-
-        outputDiv.innerHTML = `
-          <h3>✅ Result Found</h3>
-          <p><strong>Name:</strong> ${student.name}</p>
-          <p><strong>Roll No:</strong> ${student.roll}</p>
-          <p><strong>Date of Birth:</strong> ${student.dob}</p>
-          ${marksHTML}
-          <p><strong>Total Marks:</strong> ${student.total}</p>
-          <p><strong>Percentage:</strong> ${student.percentage}%</p>
-          <p><strong>Grade:</strong> ${grade}</p>
-          <button id="pdfBtn">Download PDF Report</button>
-        `;
-
-        document.getElementById('pdfBtn').onclick = () => generatePDF(student, grade);
-      } else {
-        outputDiv.innerHTML = `<p style="color:red;">❌ No result found. Please check Roll No or DOB.</p>`;
+      // ✅ Basic validation
+      if (!rollInput || !dobInput) {
+        outputDiv.innerHTML = '<p style="color:red;">⚠️ Please enter both Roll Number and Date of Birth.</p>';
+        return;
       }
-    } catch (error) {
-      outputDiv.innerHTML = `<p style="color:red;">Error fetching results.json file. Please check your setup.</p>`;
+
+      // ✅ CAPTCHA validation
+      const captchaResponse = grecaptcha.getResponse();
+      if (!captchaResponse) {
+        outputDiv.innerHTML = '<p style="color:red;">⚠️ Please verify you are not a robot.</p>';
+        return;
+      }
+
+      try {
+        const response = await fetch('results.json');
+        const data = await response.json();
+        const student = data.find(s => s.roll === rollInput && s.dob === dobInput);
+
+        if (student) {
+          const grade =
+            student.percentage >= 75 ? 'A' :
+            student.percentage >= 60 ? 'B' :
+            student.percentage >= 35 ? 'C' : 'Fail';
+
+          let marksHTML = '<table><tr><th>Subject</th><th>Marks</th></tr>';
+          for (const [subject, mark] of Object.entries(student.marks)) {
+            marksHTML += `<tr><td>${subject}</td><td>${mark}</td></tr>`;
+          }
+          marksHTML += '</table>';
+
+          outputDiv.innerHTML = `
+            <h3>✅ Result Found</h3>
+            <p><strong>Name:</strong> ${student.name}</p>
+            <p><strong>Roll No:</strong> ${student.roll}</p>
+            <p><strong>Date of Birth:</strong> ${student.dob}</p>
+            ${marksHTML}
+            <p><strong>Total Marks:</strong> ${student.total}</p>
+            <p><strong>Percentage:</strong> ${student.percentage}%</p>
+            <p><strong>Grade:</strong> ${grade}</p>
+            <button id="pdfBtn">Download PDF Report</button>
+          `;
+
+          document.getElementById('pdfBtn').onclick = () => generatePDF(student, grade);
+
+          // Reset CAPTCHA after success
+          grecaptcha.reset();
+        } else {
+          outputDiv.innerHTML = '<p style="color:red;">❌ No result found. Please check Roll No or DOB.</p>';
+          grecaptcha.reset();
+        }
+      } catch (error) {
+        outputDiv.innerHTML = '<p style="color:red;">⚠️ Error fetching results.json file. Please check your setup.</p>';
+        grecaptcha.reset();
+      }
     }
-  }
 
-  function generatePDF(student, grade) {
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
+    function generatePDF(student, grade) {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
 
-    doc.setFontSize(18);
-    doc.text("ABC International School", 105, 20, null, null, "center");
-    doc.setFontSize(12);
-    doc.text("Official Report Card", 105, 28, null, null, "center");
+      doc.setFontSize(18);
+      doc.text('ABC International School', 105, 20, null, null, 'center');
+      doc.setFontSize(12);
+      doc.text('Official Report Card', 105, 28, null, null, 'center');
 
-    // watermark
-    doc.setFontSize(50);
-    doc.setTextColor(240);
-    doc.text("VERIFIED", 105, 150, null, null, "center");
+      // watermark
+      doc.setFontSize(50);
+      doc.setTextColor(240);
+      doc.text('VERIFIED', 105, 150, null, null, 'center');
+      doc.setTextColor(0);
 
-    doc.setFontSize(12);
-    doc.setTextColor(0);
-    doc.text(`Name: ${student.name}`, 20, 50);
-    doc.text(`Roll No: ${student.roll}`, 20, 60);
-    doc.text(`Date of Birth: ${student.dob}`, 20, 70);
+      doc.setFontSize(12);
+      doc.text(`Name: ${student.name}`, 20, 50);
+      doc.text(`Roll No: ${student.roll}`, 20, 60);
+      doc.text(`Date of Birth: ${student.dob}`, 20, 70);
 
-    let y = 85;
-    doc.text("Subject-wise Marks:", 20, y);
-    y += 8;
-    for (const [subject, mark] of Object.entries(student.marks)) {
-      doc.text(`${subject}: ${mark}`, 30, y);
-      y += 8;
+      let y = 85;
+      doc.text('Subject-wise Marks:', 20, y); y += 8;
+      for (const [subject, mark] of Object.entries(student.marks)) {
+        doc.text(`${subject}: ${mark}`, 30, y);
+        y += 8;
+      }
+
+      y += 5;
+      doc.text(`Total Marks: ${student.total}`, 20, y); y += 8;
+      doc.text(`Percentage: ${student.percentage}%`, 20, y); y += 8;
+      doc.text(`Grade: ${grade}`, 20, y); y += 8;
+      doc.text(`Status: ${grade === 'Fail' ? '❌ Failed' : '✅ Passed'}`, 20, y); y += 15;
+
+      doc.line(20, y, 190, y);
+      y += 10;
+      doc.text("Principal's Signature: ________________", 20, y);
+
+      doc.setFontSize(10);
+      doc.text('Generated securely by Exam Result Portal', 105, 280, null, null, 'center');
+
+      doc.save(`${student.roll}_Result.pdf`);
     }
-
-    y += 5;
-    doc.text(`Total Marks: ${student.total}`, 20, y); y += 8;
-    doc.text(`Percentage: ${student.percentage}%`, 20, y); y += 8;
-    doc.text(`Grade: ${grade}`, 20, y); y += 8;
-    doc.text(`Status: ${grade === 'Fail' ? '❌ Failed' : '✅ Passed'}`, 20, y); y += 15;
-
-    doc.line(20, y, 190, y);
-    y += 10;
-    doc.text("Principal's Signature: ____________________", 20, y);
-
-    doc.setFontSize(10);
-    doc.text("Generated securely by Exam Result Portal", 105, 280, null, null, "center");
-
-    doc.save(`${student.roll}_Result.pdf`);
-  }
   </script>
 </body>
 </html>
-
