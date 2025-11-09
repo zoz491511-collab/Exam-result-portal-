@@ -1,7 +1,26 @@
 [
-  { "roll": "F101", "name": "shinad sanjil", "marks": 89, "result": "Pass" },
-  { "roll": "F102", "name": "safeer", "marks": 20, "result": "Fail" },
-  { "roll": "F103", "name": "asil", "marks": 76, "result": "Pass" },
-  { "roll": "F104", "name": "rinshad", "marks": 92, "result": "Pass" },
-  { "roll": "F105", "name": "ali", "marks": 42, "result": "Fail" }
+  {
+    "roll": "1001",
+    "dob": "2005-05-12",
+    "name": "Asha Kumar",
+    "marks": {
+      "Math": 88,
+      "English": 76,
+      "Science": 92
+    },
+    "total": 256,
+    "percentage": 85.33
+  },
+  {
+    "roll": "1002",
+    "dob": "2005-09-20",
+    "name": "Ravi Raj",
+    "marks": {
+      "Math": 66,
+      "English": 70,
+      "Science": 62
+    },
+    "total": 198,
+    "percentage": 66
+  }
 ]
