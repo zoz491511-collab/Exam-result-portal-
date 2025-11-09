@@ -36,73 +36,87 @@ If you want, I can:
 
 -->
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+async function checkResult() {
+  const rollInput = document.getElementById('roll').value.trim();
+  const dobInput = document.getElementById('dob').value.trim();
+  const outputDiv = document.getElementById('result');
 
-<!doctype html>
-<html lang="en">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Exam Result Portal Of (WEPC)</title>
-  <style>
-    :root { font-family: Inter, system-ui, Segoe UI, Roboto, 'Helvetica Neue', Arial; }
-    body { margin:0; background:#f4f6fb; color:#111; display:flex; align-items:flex-start; justify-content:center; padding:28px }
-    .card { width:980px; max-width:96%; background:white; border-radius:12px; padding:20px; box-shadow:0 6px 22px rgba(20,30,60,0.08) }
-    h1 { margin:0 0 8px; font-size:22px }
-    .controls { display:flex; gap:8px; flex-wrap:wrap; margin:12px 0 }
-    input[type=text] { padding:10px; border-radius:8px; border:1px solid #d8e0ef; min-width:220px }
-    button { padding:10px 12px; border-radius:8px; border:0; background:#2563eb; color:white; cursor:pointer }
-    button.secondary { background:#64748b }
-    .info { font-size:13px; color:#475569; margin-top:8px }
-    #result { margin-top:20px; padding:12px; border-radius:8px; background:#f8fafc }
-    @media (max-width:640px) { .controls{flex-direction:column} input[type=text]{width:100%} }
-  </style>
-</head>
-<body>
-  <div class="card">
-    <h1>Exam Result Portal Of (WEPC)</h1>
-    <div class="info">Enter your roll number and name to view your result.</div>
+  if (!rollInput || !dobInput) {
+    outputDiv.innerHTML = `<p style="color:red;">⚠️ Please enter Roll Number and Date of Birth</p>`;
+    return;
+  }
 
-    <div class="controls">
-      <input id="roll" type="text" placeholder="Enter Roll Number" />
-      <input id="name" type="text" placeholder="Enter Name" />
-      <button onclick="checkResult()">Check Result</button>
-    </div>
+  try {
+    const response = await fetch('results.json');
+    const data = await response.json();
 
-    <div id="result"></div>
-  </div>
+    const student = data.find(
+      (s) => s.roll === rollInput && s.dob === dobInput
+    );
 
-  <script>
-    async function checkResult() {
-      const rollInput = document.getElementById('roll').value.trim();
-      const nameInput = document.getElementById('name').value.trim().toLowerCase();
-      const outputDiv = document.getElementById('result');
+    if (student) {
+      outputDiv.innerHTML = `
+        <h3>✅ Result Found</h3>
+        <p><strong>Name:</strong> ${student.name}</p>
+        <p><strong>Roll No:</strong> ${student.roll}</p>
+        <p><strong>Date of Birth:</strong> ${student.dob}</p>
+        <p><strong>Marks:</strong> ${Object.entries(student.marks)
+          .map(([sub, mark]) => `${sub}: ${mark}`)
+          .join(', ')}</p>
+        <p><strong>Total:</strong> ${student.total}</p>
+        <p><strong>Percentage:</strong> ${student.percentage}%</p>
+        <p><strong>Status:</strong> ${
+          student.percentage >= 35 ? 'Pass' : 'Fail'
+        }</p>
+        <button id="pdfBtn">Download PDF</button>
+      `;
 
-      outputDiv.innerHTML = `<p>Checking...</p>`;
-
-      try {
-        const response = await fetch('results.json');
-        if (!response.ok) throw new Error('File not found');
-        const data = await response.json();
-
-        const student = data.find(
-          (s) => s.roll === rollInput && s.name.toLowerCase() === nameInput
-        );
-
-        if (student) {
-          outputDiv.innerHTML = `
-            <h3>Result Found ✅</h3>
-            <p><strong>Name:</strong> ${student.name}</p>
-            <p><strong>Roll No:</strong> ${student.roll}</p>
-            <p><strong>Marks:</strong> ${student.marks}</p>
-            <p><strong>Status:</strong> ${student.result}</p>
-          `;
-        } else {
-          outputDiv.innerHTML = `<p style="color:red;">No result found ❌</p>`;
-        }
-      } catch (error) {
-        outputDiv.innerHTML = `<p style="color:red;">Error: ${error.message}</p>`;
-      }
+      document
+        .getElementById('pdfBtn')
+        .addEventListener('click', () => generatePDF(student));
+    } else {
+      outputDiv.innerHTML = `<p style="color:red;">❌ No result found. Check Roll Number or DOB.</p>`;
     }
-  </script>
-</body>
-</html>
+  } catch (error) {
+    outputDiv.innerHTML = `<p style="color:red;">⚠️ Error fetching results.json</p>`;
+  }
+}
+
+function generatePDF(student) {
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF();
+
+  doc.setFontSize(16);
+  doc.text('Exam Result Report Card', 70, 20);
+  doc.setFontSize(12);
+  doc.text(`Name: ${student.name}`, 20, 40);
+  doc.text(`Roll Number: ${student.roll}`, 20, 50);
+  doc.text(`Date of Birth: ${student.dob}`, 20, 60);
+  doc.text('Marks:', 20, 75);
+
+  let y = 85;
+  for (const [subject, mark] of Object.entries(student.marks)) {
+    doc.text(`${subject}: ${mark}`, 30, y);
+    y += 10;
+  }
+
+  doc.text(`Total: ${student.total}`, 20, y + 10);
+  doc.text(`Percentage: ${student.percentage}%`, 20, y + 20);
+  doc.text(
+    `Status: ${student.percentage >= 35 ? 'Pass ✅' : 'Fail ❌'}`,
+    20,
+    y + 30
+  );
+
+  doc.setFontSize(10);
+  doc.text(
+    `Generated securely for Roll No: ${student.roll}`,
+    20,
+    y + 50
+  );
+
+  doc.save(`${student.roll}_result.pdf`);
+}
+</script>
