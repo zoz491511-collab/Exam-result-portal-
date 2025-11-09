@@ -1,4 +1,21 @@
 [
-  {"roll": "101", "name": "John", "marks": "89"},
-  {"roll": "102", "name": "Alice", "marks": "76"}
+  {
+    "roll": "101",
+    "dob": "2005-05-10",
+    "name": "John Doe",
+    "marks": "88"
+  },
+  {
+    "roll": "102",
+    "dob": "2005-07-22",
+    "name": "Alice Smith",
+    "marks": "76"
+  },
+  {
+    "roll": "103",
+    "dob": "2005-09-18",
+    "name": "Rahul Kumar",
+    "marks": "92"
+  }
 ]
+
